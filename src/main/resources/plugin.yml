@@ -1,0 +1,42 @@
+name: TagGame
+version: 1.0
+main: com.yourname.tag.TagGame
+api-version: 1.20
+softdepend: [DecentHolograms]
+description: A fun tag game plugin with multiple game modes
+author: YourName
+
+commands:
+  tag:
+    description: Main command for the Tag Game plugin
+    usage: /<command> [help|join|leave|start|stop|it|score|mode|setleaderboard]
+    aliases: [taggame, tag]
+
+permissions:
+  tag.admin.start:
+    description: Allows starting the tag game
+    default: op
+  tag.admin.stop:
+    description: Allows stopping the tag game
+    default: op
+  tag.admin.mode:
+    description: Allows changing game modes
+    default: op
+  tag.admin.setleaderboard:
+    description: Allows creating leaderboards
+    default: op
+  tag.admin.setspawn:
+    description: Allows setting spawn points
+    default: op
+  tag.admin.setborder:
+    description: Allows setting game border
+    default: op
+  tag.player.join:
+    description: Join the tag game
+    default: true
+  tag.player.leave:
+    description: Leave the tag game
+    default: true
+  tag.player.viewit:
+    description: View who is 'It'
+    default: true

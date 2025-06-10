@@ -1,0 +1,7 @@
+# Tag Game World Configuration
+
+# Border size in blocks
+borderSize: 100
+
+# Spawn locations will be set automatically when the world is created
+# and can be modified using in-game commands 
