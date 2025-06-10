@@ -1,19 +1,19 @@
 # Tag Game Plugin
 
-A versatile Minecraft tag game plugin with multiple game modes, custom maps, and team support.
+A versatile Minecraft tag game plugin with multiple game modes, custom maps, and team support. **Now supports Minecraft 1.21.4!**
 
 ## Features
 - Multiple game modes (Classic, Freeze Tag, Team Mode)
-- Custom map support
+- Custom map support (multiple maps in the same world)
 - Team mode (2v2 to 10v10)
-- Special items and power-ups
-- Score tracking and leaderboards
+- Special items and power-ups (using correct 1.21.4 potion types)
+- Score tracking and leaderboards (hologram-based and sign-based)
 - Auto-start functionality
 - Customizable game settings
 
 ## Installation
-1. Download the latest release from the releases page
-2. Place the .jar file in your server's `plugins` folder
+1. Download the latest release from the [GitHub releases page](https://github.com/ChickenWithACrown/Tag-Game-Plugin/releases)
+2. Place the `.jar` file in your server's `plugins` folder
 3. Restart your server
 4. Configure the plugin in `plugins/TagGame/config.yml`
 
@@ -38,14 +38,21 @@ A versatile Minecraft tag game plugin with multiple game modes, custom maps, and
 
 ## Setting Up a Game
 
-### 1. Create a Map
-1. Build your map in the world
-2. Set spawn points using commands:
-```
-/tag setmap <mapname>
-/tag setitspawn
-/tag setplayerspawn
-```
+### 1. Create Multiple Maps in the Same World
+1. Build your map areas in the same world (e.g., "ForestMap" and "DesertMap")
+2. For each map, set the map name and spawns:
+   - Stand at the IT spawn for your first map and run:
+     ```
+     /tag setmap ForestMap
+     /tag setitspawn
+     /tag setplayerspawn
+     ```
+   - Move to your second map area, stand at the IT spawn, and run:
+     ```
+     /tag setmap DesertMap
+     /tag setitspawn
+     /tag setplayerspawn
+     ```
 
 ### 2. Create a Game Sign
 1. Place a sign with this format:
@@ -55,7 +62,7 @@ A versatile Minecraft tag game plugin with multiple game modes, custom maps, and
 <teamsize>
 <mapname>
 ```
-Example for 5v5 team mode:
+Example for 5v5 team mode on ForestMap:
 ```
 [TagGame]
 team
@@ -91,19 +98,23 @@ ForestMap
 - `/tag border <size>` - Set game border
 - `/tag setleaderboard` - Create leaderboard hologram
 
-## Special Items
+## Leaderboards
+- **Hologram Leaderboard:** Use `/tag setleaderboard` to create a floating leaderboard at your location (requires DecentHolograms plugin).
+- **Sign Leaderboard:** Place a sign with `[TagLeader]` to show the top 3 players on a sign.
+
+## Special Items (1.21.4+ Compatible)
 
 ### IT Player Items
 - Tagger (Blaze Rod) - Tag other players
 - Speed Potion - Temporary speed boost
-- Jump Potion - Enhanced jumping
-- Strength Potion - Increased damage
+- Jump Potion - Enhanced jumping (`JUMP_BOOST`)
+- Strength Potion - Increased damage (`STRENGTH`)
 
 ### Runner Items
 - Smoke Bomb - Creates smoke cloud
 - Speed Potion - Temporary speed boost
 - Invisibility Potion - Hide from IT
-- Jump Potion - Enhanced jumping
+- Jump Potion - Enhanced jumping (`JUMP_BOOST`)
 - Shield - Block IT's attacks
 - Grappling Hook - Swing to safety
 - Teleporter - Random teleportation
@@ -181,7 +192,7 @@ team
    - Check if map is properly configured
 
 ## Support
-For issues and feature requests, please create an issue on the GitHub repository.
+For issues and feature requests, please create an issue on the [GitHub repository](https://github.com/ChickenWithACrown/Tag-Game-Plugin/issues).
 
 ## License
 This project is licensed under the MIT License - see the LICENSE file for details.
