@@ -110,18 +110,21 @@ public class GameView {
         player.sendMessage(ChatColor.GOLD + "=== Tag Game Commands ===");
         player.sendMessage(ChatColor.YELLOW + "/tag help" + ChatColor.WHITE + " - Shows this help menu");
         player.sendMessage(ChatColor.YELLOW + "/tag" + ChatColor.WHITE + " - Opens the Tag Game menu");
-        player.sendMessage(ChatColor.YELLOW + "/tag join" + ChatColor.WHITE + " - Join the Tag game");
+        player.sendMessage(ChatColor.YELLOW + "/tag join <gameID>" + ChatColor.WHITE + " - Join the Tag game");
         player.sendMessage(ChatColor.YELLOW + "/tag leave" + ChatColor.WHITE + " - Leave the Tag game");
-        player.sendMessage(ChatColor.YELLOW + "/tag start" + ChatColor.WHITE + " - Start the Tag game (Admin only)");
-        player.sendMessage(ChatColor.YELLOW + "/tag stop" + ChatColor.WHITE + " - Stop the Tag game (Admin only)");
+        player.sendMessage(ChatColor.YELLOW + "/tag start <gameID>" + ChatColor.WHITE + " - Start the Tag game (Admin only)");
+        player.sendMessage(ChatColor.YELLOW + "/tag stop <gameID>" + ChatColor.WHITE + " - Stop the Tag game (Admin only)");
         player.sendMessage(ChatColor.YELLOW + "/tag it" + ChatColor.WHITE + " - Check who is currently IT");
         player.sendMessage(ChatColor.YELLOW + "/tag score" + ChatColor.WHITE + " - View current scores");
-        player.sendMessage(ChatColor.YELLOW + "/tag mode <mode>" + ChatColor.WHITE + " - Change game mode (Admin only)");
+        player.sendMessage(ChatColor.YELLOW + "/tag mode <gameID> <mode>" + ChatColor.WHITE + " - Change game mode (Admin only)");
+        player.sendMessage(ChatColor.YELLOW + "/tag setmap <gameID> <mapname>" + ChatColor.WHITE + " - Set map name (Admin only)");
+        player.sendMessage(ChatColor.YELLOW + "/tag setitspawn <gameID>" + ChatColor.WHITE + " - Set IT spawn point (Admin only)");
+        player.sendMessage(ChatColor.YELLOW + "/tag setplayerspawn <gameID>" + ChatColor.WHITE + " - Set player spawn point (Admin only)");
         player.sendMessage(ChatColor.GRAY + "Available modes: classic, freeze, team");
         player.sendMessage(ChatColor.GOLD + "=== Examples ===");
-        player.sendMessage(ChatColor.WHITE + "• /tag mode freeze" + ChatColor.GRAY + " - Changes game to Freeze Tag mode");
-        player.sendMessage(ChatColor.WHITE + "• /tag score" + ChatColor.GRAY + " - Shows current scores and game time");
-        player.sendMessage(ChatColor.WHITE + "• /tag it" + ChatColor.GRAY + " - Shows who is currently IT");
+        player.sendMessage(ChatColor.WHITE + "• /tag setmap team_desert Desert" + ChatColor.GRAY + " - Sets map name to Desert");
+        player.sendMessage(ChatColor.WHITE + "• /tag setitspawn team_desert" + ChatColor.GRAY + " - Sets IT spawn at your location");
+        player.sendMessage(ChatColor.WHITE + "• /tag setplayerspawn team_desert" + ChatColor.GRAY + " - Sets player spawn at your location");
     }
 
     public void createLeaderboardHologram(Location location) {

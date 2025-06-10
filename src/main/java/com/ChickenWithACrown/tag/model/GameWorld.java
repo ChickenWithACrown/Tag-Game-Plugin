@@ -23,11 +23,12 @@ public class GameWorld {
     private World world;
     private Location itSpawnLocation;
     private Location playerSpawnLocation;
-    private int borderSize = 100;
     private final Map<UUID, ItemStack[]> savedInventories = new HashMap<>();
     private final Map<UUID, ItemStack[]> savedArmor = new HashMap<>();
     private String mapName;
     private final Map<String, Location> mapSpawns = new HashMap<>();
+    private Location corner1;
+    private Location corner2;
 
     public GameWorld(TagGame plugin) {
         this.plugin = plugin;
@@ -51,8 +52,15 @@ public class GameWorld {
 
     public boolean isWithinBorder(Location location) {
         if (world == null || !location.getWorld().equals(world)) return false;
-        return Math.abs(location.getBlockX()) <= borderSize && 
-               Math.abs(location.getBlockZ()) <= borderSize;
+        if (corner1 == null || corner2 == null) return true; // If corners not set, allow movement
+        
+        int minX = Math.min(corner1.getBlockX(), corner2.getBlockX());
+        int maxX = Math.max(corner1.getBlockX(), corner2.getBlockX());
+        int minZ = Math.min(corner1.getBlockZ(), corner2.getBlockZ());
+        int maxZ = Math.max(corner1.getBlockZ(), corner2.getBlockZ());
+        
+        return location.getBlockX() >= minX && location.getBlockX() <= maxX &&
+               location.getBlockZ() >= minZ && location.getBlockZ() <= maxZ;
     }
 
     public ItemStack createGrapplingHook() {
@@ -92,7 +100,7 @@ public class GameWorld {
         ItemStack potion = new ItemStack(Material.SPLASH_POTION);
         PotionMeta meta = (PotionMeta) potion.getItemMeta();
         meta.setDisplayName("§aJump Boost");
-        meta.addCustomEffect(new PotionEffect(PotionEffectType.JUMP, 200, 1), true);
+        meta.addCustomEffect(new PotionEffect(PotionEffectType.JUMP_BOOST, 200, 1), true);
         potion.setItemMeta(meta);
         return potion;
     }
@@ -110,7 +118,7 @@ public class GameWorld {
         ItemStack potion = new ItemStack(Material.SPLASH_POTION);
         PotionMeta meta = (PotionMeta) potion.getItemMeta();
         meta.setDisplayName("§cStrength Boost");
-        meta.addCustomEffect(new PotionEffect(PotionEffectType.INCREASE_DAMAGE, 200, 0), true);
+        meta.addCustomEffect(new PotionEffect(PotionEffectType.STRENGTH, 200, 0), true);
         potion.setItemMeta(meta);
         return potion;
     }
@@ -257,5 +265,57 @@ public class GameWorld {
 
     public List<String> getAvailableMaps() {
         return new ArrayList<>(mapSpawns.keySet());
+    }
+
+    public void setItSpawnLocation(Location location) {
+        this.itSpawnLocation = location;
+        // Save to config
+        plugin.getConfig().set("maps." + mapName + ".it_spawn", location);
+        plugin.saveConfig();
+    }
+
+    public void setPlayerSpawnLocation(Location location) {
+        this.playerSpawnLocation = location;
+        // Save to config
+        plugin.getConfig().set("maps." + mapName + ".player_spawn", location);
+        plugin.saveConfig();
+    }
+
+    public void setCorner1(Location location) {
+        this.corner1 = location;
+        plugin.getConfig().set("maps." + mapName + ".corner1", location);
+        plugin.saveConfig();
+        createWorldGuardRegion();
+    }
+
+    public void setCorner2(Location location) {
+        this.corner2 = location;
+        plugin.getConfig().set("maps." + mapName + ".corner2", location);
+        plugin.saveConfig();
+        createWorldGuardRegion();
+    }
+
+    private void createWorldGuardRegion() {
+        if (corner1 == null || corner2 == null) return;
+        
+        try {
+            // Create WorldGuard region using commands
+            String regionName = "tag_" + mapName.toLowerCase();
+            String cmd = "rg define " + regionName + " " + 
+                        corner1.getBlockX() + "," + corner1.getBlockY() + "," + corner1.getBlockZ() + " " +
+                        corner2.getBlockX() + "," + corner2.getBlockY() + "," + corner2.getBlockZ();
+            
+            plugin.getServer().dispatchCommand(plugin.getServer().getConsoleSender(), cmd);
+            
+            // Set region flags
+            plugin.getServer().dispatchCommand(plugin.getServer().getConsoleSender(), "rg flag " + regionName + " mob-spawning deny");
+            plugin.getServer().dispatchCommand(plugin.getServer().getConsoleSender(), "rg flag " + regionName + " block-break deny");
+            plugin.getServer().dispatchCommand(plugin.getServer().getConsoleSender(), "rg flag " + regionName + " block-place deny");
+            plugin.getServer().dispatchCommand(plugin.getServer().getConsoleSender(), "rg flag " + regionName + " pvp allow");
+            
+            plugin.getLogger().info("Created WorldGuard region: " + regionName);
+        } catch (Exception e) {
+            plugin.getLogger().warning("Failed to create WorldGuard region: " + e.getMessage());
+        }
     }
 } 

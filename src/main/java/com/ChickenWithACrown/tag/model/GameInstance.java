@@ -1,7 +1,6 @@
 package com.ChickenWithACrown.tag.model;
 
 import org.bukkit.Location;
-import java.util.UUID;
 
 public class GameInstance {
     private final String id;
@@ -15,13 +14,13 @@ public class GameInstance {
     private String displayName;
 
     public GameInstance(String mode, int teamSize, String mapName, GameState gameState, GameWorld gameWorld) {
-        this.id = UUID.randomUUID().toString();
         this.mode = mode;
         this.teamSize = teamSize;
         this.mapName = mapName;
         this.gameState = gameState;
         this.gameWorld = gameWorld;
         this.displayName = mode + " " + mapName;
+        this.id = mode.toLowerCase() + "_" + mapName.toLowerCase();
     }
 
     public String getId() {

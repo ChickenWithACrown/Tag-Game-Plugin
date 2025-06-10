@@ -29,6 +29,35 @@ public class GameController {
     public GameController(TagGame plugin) {
         this.plugin = plugin;
         startGameTimer();
+        loadGameInstances(); // Load saved games on startup
+    }
+
+    private void loadGameInstances() {
+        if (plugin.getConfig().contains("games")) {
+            for (String gameId : plugin.getConfig().getConfigurationSection("games").getKeys(false)) {
+                String mode = plugin.getConfig().getString("games." + gameId + ".mode");
+                int teamSize = plugin.getConfig().getInt("games." + gameId + ".teamSize");
+                String mapName = plugin.getConfig().getString("games." + gameId + ".mapName");
+                Location signLoc = (Location) plugin.getConfig().get("games." + gameId + ".signLocation");
+                
+                if (mode != null && mapName != null && signLoc != null) {
+                    GameState gameState = new GameState(plugin);
+                    GameWorld gameWorld = new GameWorld(plugin);
+                    GameInstance instance = new GameInstance(mode, teamSize, mapName, gameState, gameWorld);
+                    instance.setSignLocation(signLoc);
+                    gameInstances.put(gameId, instance);
+                }
+            }
+        }
+    }
+
+    public void saveGameInstance(GameInstance instance) {
+        String id = instance.getId();
+        plugin.getConfig().set("games." + id + ".mode", instance.getMode());
+        plugin.getConfig().set("games." + id + ".teamSize", instance.getTeamSize());
+        plugin.getConfig().set("games." + id + ".mapName", instance.getMapName());
+        plugin.getConfig().set("games." + id + ".signLocation", instance.getSignLocation());
+        plugin.saveConfig();
     }
 
     public GameInstance createGameInstance(String mode, int teamSize, String mapName, Location signLocation) {
@@ -37,6 +66,7 @@ public class GameController {
         GameInstance instance = new GameInstance(mode, teamSize, mapName, gameState, gameWorld);
         instance.setSignLocation(signLocation);
         gameInstances.put(instance.getId(), instance);
+        saveGameInstance(instance); // Save the new instance
         return instance;
     }
 
@@ -295,7 +325,7 @@ public class GameController {
         ItemStack jumpPotion = new ItemStack(Material.SPLASH_POTION);
         PotionMeta jumpMeta = (PotionMeta) jumpPotion.getItemMeta();
         jumpMeta.setDisplayName(ChatColor.GREEN + "Jump Boost");
-        jumpMeta.addCustomEffect(new PotionEffect(PotionEffectType.JUMP, 200, 1), true);
+        jumpMeta.addCustomEffect(new PotionEffect(PotionEffectType.JUMP_BOOST, 200, 1), true);
         jumpPotion.setItemMeta(jumpMeta);
         player.getInventory().setItem(2, jumpPotion);
 
@@ -303,7 +333,7 @@ public class GameController {
         ItemStack strengthPotion = new ItemStack(Material.SPLASH_POTION);
         PotionMeta strengthMeta = (PotionMeta) strengthPotion.getItemMeta();
         strengthMeta.setDisplayName(ChatColor.DARK_RED + "Strength Boost");
-        strengthMeta.addCustomEffect(new PotionEffect(PotionEffectType.INCREASE_DAMAGE, 200, 0), true);
+        strengthMeta.addCustomEffect(new PotionEffect(PotionEffectType.STRENGTH, 200, 0), true);
         strengthPotion.setItemMeta(strengthMeta);
         player.getInventory().setItem(3, strengthPotion);
     }
@@ -343,7 +373,7 @@ public class GameController {
         ItemStack jumpPotion = new ItemStack(Material.SPLASH_POTION);
         PotionMeta jumpMeta = (PotionMeta) jumpPotion.getItemMeta();
         jumpMeta.setDisplayName(ChatColor.GREEN + "Jump Boost");
-        jumpMeta.addCustomEffect(new PotionEffect(PotionEffectType.JUMP, 200, 1), true);
+        jumpMeta.addCustomEffect(new PotionEffect(PotionEffectType.JUMP_BOOST, 200, 1), true);
         jumpPotion.setItemMeta(jumpMeta);
         player.getInventory().setItem(3, jumpPotion);
     }
@@ -396,5 +426,29 @@ public class GameController {
 
     public List<GameInstance> getGameInstances() {
         return new ArrayList<>(gameInstances.values());
+    }
+
+    public void setItSpawn(GameInstance instance, Location location) {
+        instance.getGameWorld().setItSpawnLocation(location);
+        // Save to config
+        plugin.getConfig().set("games." + instance.getId() + ".it_spawn", location);
+        plugin.saveConfig();
+    }
+
+    public void setPlayerSpawn(GameInstance instance, Location location) {
+        instance.getGameWorld().setPlayerSpawnLocation(location);
+        // Save to config
+        plugin.getConfig().set("games." + instance.getId() + ".player_spawn", location);
+        plugin.saveConfig();
+    }
+
+    public void setMapCorner1(GameInstance instance, Location location) {
+        instance.getGameWorld().setCorner1(location);
+        saveGameInstance(instance);
+    }
+
+    public void setMapCorner2(GameInstance instance, Location location) {
+        instance.getGameWorld().setCorner2(location);
+        saveGameInstance(instance);
     }
 } 

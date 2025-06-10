@@ -51,6 +51,12 @@ public class TagGame extends JavaPlugin implements Listener {
             } else {
                 getLogger().info("DecentHolograms found! Leaderboard features enabled.");
             }
+
+            if (getServer().getPluginManager().getPlugin("WorldGuard") == null) {
+                getLogger().warning("WorldGuard not found! Please install WorldGuard for proper game area protection.");
+            } else {
+                getLogger().info("WorldGuard found! Game area protection enabled.");
+            }
             
             getLogger().info("TagGame enabled successfully!");
         } catch (Exception e) {
@@ -184,6 +190,34 @@ public class TagGame extends JavaPlugin implements Listener {
                     player.sendMessage(ChatColor.RED + "Game not found!");
                 }
             }
+            case "setitspawn" -> {
+                if (args.length < 2) {
+                    player.sendMessage(ChatColor.RED + "Please specify a game ID!");
+                    return true;
+                }
+                if (!player.hasPermission("tag.admin.setmap")) return true;
+                GameInstance instance = gameController.getGameInstance(args[1]);
+                if (instance != null) {
+                    gameController.setItSpawn(instance, player.getLocation());
+                    player.sendMessage(ChatColor.GREEN + "IT spawn set for " + instance.getDisplayName() + "!");
+                } else {
+                    player.sendMessage(ChatColor.RED + "Game not found!");
+                }
+            }
+            case "setplayerspawn" -> {
+                if (args.length < 2) {
+                    player.sendMessage(ChatColor.RED + "Please specify a game ID!");
+                    return true;
+                }
+                if (!player.hasPermission("tag.admin.setmap")) return true;
+                GameInstance instance = gameController.getGameInstance(args[1]);
+                if (instance != null) {
+                    gameController.setPlayerSpawn(instance, player.getLocation());
+                    player.sendMessage(ChatColor.GREEN + "Player spawn set for " + instance.getDisplayName() + "!");
+                } else {
+                    player.sendMessage(ChatColor.RED + "Game not found!");
+                }
+            }
             case "autostart" -> {
                 if (args.length < 3) {
                     player.sendMessage(ChatColor.RED + "Please specify a game ID and true/false!");
@@ -205,9 +239,52 @@ public class TagGame extends JavaPlugin implements Listener {
                     player.sendMessage(ChatColor.YELLOW + instance.getDisplayName() + 
                         " (" + instance.getGameState().getPlayersInGame().size() + "/" + 
                         instance.getMaxPlayers() + " players)");
+                    player.sendMessage(ChatColor.GRAY + "ID: " + ChatColor.WHITE + instance.getId());
                 }
             }
-            default -> player.sendMessage(ChatColor.RED + "Unknown subcommand.");
+            case "setcorner1" -> {
+                if (args.length < 2) {
+                    player.sendMessage(ChatColor.RED + "Please specify a game ID!");
+                    return true;
+                }
+                if (!player.hasPermission("tag.admin.setmap")) return true;
+                GameInstance instance = gameController.getGameInstance(args[1]);
+                if (instance != null) {
+                    gameController.setMapCorner1(instance, player.getLocation());
+                    player.sendMessage(ChatColor.GREEN + "First corner set for " + instance.getDisplayName() + "!");
+                    
+                    // Create WorldGuard region
+                    String regionName = "tag_" + instance.getMapName().toLowerCase();
+                    player.performCommand("rg define " + regionName + " " + 
+                        player.getLocation().getBlockX() + "," + 
+                        player.getLocation().getBlockY() + "," + 
+                        player.getLocation().getBlockZ());
+                } else {
+                    player.sendMessage(ChatColor.RED + "Game not found!");
+                }
+            }
+            case "setcorner2" -> {
+                if (args.length < 2) {
+                    player.sendMessage(ChatColor.RED + "Please specify a game ID!");
+                    return true;
+                }
+                if (!player.hasPermission("tag.admin.setmap")) return true;
+                GameInstance instance = gameController.getGameInstance(args[1]);
+                if (instance != null) {
+                    gameController.setMapCorner2(instance, player.getLocation());
+                    player.sendMessage(ChatColor.GREEN + "Second corner set for " + instance.getDisplayName() + "!");
+                    
+                    // Set WorldGuard region flags
+                    String regionName = "tag_" + instance.getMapName().toLowerCase();
+                    player.performCommand("rg flag " + regionName + " mob-spawning deny");
+                    player.performCommand("rg flag " + regionName + " block-break deny");
+                    player.performCommand("rg flag " + regionName + " block-place deny");
+                    player.performCommand("rg flag " + regionName + " pvp allow");
+                } else {
+                    player.sendMessage(ChatColor.RED + "Game not found!");
+                }
+            }
+            default -> player.sendMessage(ChatColor.RED + "Unknown subcommand. Use /tag help for commands.");
         }
         return true;
     }
@@ -239,7 +316,7 @@ public class TagGame extends JavaPlugin implements Listener {
         ItemStack jumpPotion = new ItemStack(Material.SPLASH_POTION);
         PotionMeta jumpMeta = (PotionMeta) jumpPotion.getItemMeta();
         jumpMeta.setDisplayName(ChatColor.GREEN + "Jump Boost");
-        jumpMeta.addCustomEffect(new PotionEffect(PotionEffectType.JUMP, 200, 1), true);
+        jumpMeta.addCustomEffect(new PotionEffect(PotionEffectType.JUMP_BOOST, 200, 1), true);
         jumpPotion.setItemMeta(jumpMeta);
         player.getInventory().setItem(2, jumpPotion);
 
@@ -247,7 +324,7 @@ public class TagGame extends JavaPlugin implements Listener {
         ItemStack strengthPotion = new ItemStack(Material.SPLASH_POTION);
         PotionMeta strengthMeta = (PotionMeta) strengthPotion.getItemMeta();
         strengthMeta.setDisplayName(ChatColor.DARK_RED + "Strength Boost");
-        strengthMeta.addCustomEffect(new PotionEffect(PotionEffectType.INCREASE_DAMAGE, 200, 0), true);
+        strengthMeta.addCustomEffect(new PotionEffect(PotionEffectType.STRENGTH, 200, 0), true);
         strengthPotion.setItemMeta(strengthMeta);
         player.getInventory().setItem(3, strengthPotion);
     }
@@ -287,7 +364,7 @@ public class TagGame extends JavaPlugin implements Listener {
         ItemStack jumpPotion = new ItemStack(Material.SPLASH_POTION);
         PotionMeta jumpMeta = (PotionMeta) jumpPotion.getItemMeta();
         jumpMeta.setDisplayName(ChatColor.GREEN + "Jump Boost");
-        jumpMeta.addCustomEffect(new PotionEffect(PotionEffectType.JUMP, 200, 1), true);
+        jumpMeta.addCustomEffect(new PotionEffect(PotionEffectType.JUMP_BOOST, 200, 1), true);
         jumpPotion.setItemMeta(jumpMeta);
         player.getInventory().setItem(3, jumpPotion);
     }
@@ -325,7 +402,7 @@ public class TagGame extends JavaPlugin implements Listener {
                 
                 Location loc = event.getPlayer().getLocation();
                 for (int i = 0; i < 10; i++) {
-                    loc.getWorld().spawnParticle(Particle.SMOKE_LARGE, loc, 20, 0.5, 0.5, 0.5, 0.1);
+                    loc.getWorld().spawnParticle(Particle.SMOKE, loc, 20, 0.5, 0.5, 0.5, 0.1);
                 }
                 event.getPlayer().playSound(loc, Sound.BLOCK_FIRE_EXTINGUISH, 1.0f, 1.0f);
             }
