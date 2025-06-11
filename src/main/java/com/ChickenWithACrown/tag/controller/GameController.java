@@ -395,6 +395,40 @@ public class GameController {
         gameState.removePlayer(player);
         player.sendMessage(ChatColor.RED + "You left " + instance.getDisplayName() + ".");
         player.playSound(player.getLocation(), Sound.ENTITY_VILLAGER_NO, 1, 1);
+
+        // Teleport player back to spawn
+        Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "spawn " + player.getName());
+        player.getInventory().clear();
+
+        // Check if we should end the game
+        if (gameState.isGameRunning()) {
+            int remainingPlayers = gameState.getPlayersInGame().size();
+            int maxPlayers = instance.getMaxPlayers();
+            if (remainingPlayers < maxPlayers / 2) {
+                Bukkit.broadcastMessage(ChatColor.RED + "Too many players left! Ending game...");
+                stopGame(instance);
+            }
+        }
+
+        // Update the game sign
+        updateGameSign(instance);
+    }
+
+    private void updateGameSign(GameInstance instance) {
+        if (instance.getSignLocation() != null && instance.getSignLocation().getBlock().getState() instanceof Sign sign) {
+            GameState gameState = instance.getGameState();
+            int playersInGame = gameState.getPlayersInGame().size();
+            int maxPlayers = instance.getMaxPlayers();
+            String status = gameState.isGameRunning() ? ChatColor.RED + "In Progress" : 
+                          playersInGame >= maxPlayers ? ChatColor.YELLOW + "Full" :
+                          ChatColor.GREEN + "Waiting";
+            
+            sign.setLine(0, ChatColor.AQUA + "[TagGame]");
+            sign.setLine(1, ChatColor.GREEN + instance.getMode());
+            sign.setLine(2, ChatColor.YELLOW + String.valueOf(playersInGame) + "/" + String.valueOf(maxPlayers));
+            sign.setLine(3, status);
+            sign.update();
+        }
     }
 
     public void setMapForInstance(GameInstance instance, String mapName) {

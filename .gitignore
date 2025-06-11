@@ -1,35 +1,29 @@
-# Compiled class files
-*.class
+# Source code
+src/
+*.java
 
-# Build directories
-/target/
-/build/
-/out/
+# Build files
+target/
+*.class
+*.jar
+!TagGame.jar
 
 # IDE files
 .idea/
 *.iml
 .vscode/
-*.sublime-workspace
-*.sublime-project
+*.project
+*.classpath
+.settings/
 
-# Log files
+# Compiled files
+bin/
+out/
+build/
+
+# Logs
 *.log
 
-# Server files
-/server/
-/plugins/
-
-# Gradle files
-.gradle/
-gradle-app.setting
-!gradle-wrapper.jar
-
-# Maven files
-.mvn/
-mvnw
-mvnw.cmd
-
-# OS specific files
+# OS files
 .DS_Store
 Thumbs.db 

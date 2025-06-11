@@ -29,6 +29,11 @@ public class GameWorld {
     private final Map<String, Location> mapSpawns = new HashMap<>();
     private Location corner1;
     private Location corner2;
+    private boolean mobSpawningEnabled = false;
+    private boolean blockBreakingEnabled = false;
+    private boolean blockPlacingEnabled = false;
+    private boolean pvpEnabled = true;
+    private boolean decayEnabled = false;
 
     public GameWorld(TagGame plugin) {
         this.plugin = plugin;
@@ -316,6 +321,93 @@ public class GameWorld {
             plugin.getLogger().info("Created WorldGuard region: " + regionName);
         } catch (Exception e) {
             plugin.getLogger().warning("Failed to create WorldGuard region: " + e.getMessage());
+        }
+    }
+
+    public boolean isMobSpawningEnabled() {
+        return mobSpawningEnabled;
+    }
+
+    public void setMobSpawningEnabled(boolean enabled) {
+        this.mobSpawningEnabled = enabled;
+        updateWorldGuardFlags();
+    }
+
+    public boolean isBlockBreakingEnabled() {
+        return blockBreakingEnabled;
+    }
+
+    public void setBlockBreakingEnabled(boolean enabled) {
+        this.blockBreakingEnabled = enabled;
+        updateWorldGuardFlags();
+    }
+
+    public boolean isBlockPlacingEnabled() {
+        return blockPlacingEnabled;
+    }
+
+    public void setBlockPlacingEnabled(boolean enabled) {
+        this.blockPlacingEnabled = enabled;
+        updateWorldGuardFlags();
+    }
+
+    public boolean isPvPEnabled() {
+        return pvpEnabled;
+    }
+
+    public void setPvPEnabled(boolean enabled) {
+        this.pvpEnabled = enabled;
+        updateWorldGuardFlags();
+    }
+
+    public boolean isDecayEnabled() {
+        return decayEnabled;
+    }
+
+    public void setDecayEnabled(boolean enabled) {
+        this.decayEnabled = enabled;
+        updateWorldGuardFlags();
+    }
+
+    private void updateWorldGuardFlags() {
+        if (corner1 == null || corner2 == null) return;
+        
+        try {
+            String regionName = "tag_" + mapName.toLowerCase();
+            
+            // Update flags based on current settings
+            plugin.getServer().dispatchCommand(plugin.getServer().getConsoleSender(), 
+                "rg flag " + regionName + " mob-spawning " + (mobSpawningEnabled ? "allow" : "deny"));
+            plugin.getServer().dispatchCommand(plugin.getServer().getConsoleSender(), 
+                "rg flag " + regionName + " block-break " + (blockBreakingEnabled ? "allow" : "deny"));
+            plugin.getServer().dispatchCommand(plugin.getServer().getConsoleSender(), 
+                "rg flag " + regionName + " block-place " + (blockPlacingEnabled ? "allow" : "deny"));
+            plugin.getServer().dispatchCommand(plugin.getServer().getConsoleSender(), 
+                "rg flag " + regionName + " pvp " + (pvpEnabled ? "allow" : "deny"));
+            plugin.getServer().dispatchCommand(plugin.getServer().getConsoleSender(), 
+                "rg flag " + regionName + " decay " + (decayEnabled ? "allow" : "deny"));
+            
+            // Save to config
+            plugin.getConfig().set("maps." + mapName + ".flags.mob_spawning", mobSpawningEnabled);
+            plugin.getConfig().set("maps." + mapName + ".flags.block_breaking", blockBreakingEnabled);
+            plugin.getConfig().set("maps." + mapName + ".flags.block_placing", blockPlacingEnabled);
+            plugin.getConfig().set("maps." + mapName + ".flags.pvp", pvpEnabled);
+            plugin.getConfig().set("maps." + mapName + ".flags.decay", decayEnabled);
+            plugin.saveConfig();
+            
+            plugin.getLogger().info("Updated WorldGuard flags for region: " + regionName);
+        } catch (Exception e) {
+            plugin.getLogger().warning("Failed to update WorldGuard flags: " + e.getMessage());
+        }
+    }
+
+    public void loadFlags() {
+        if (plugin.getConfig().contains("maps." + mapName + ".flags")) {
+            mobSpawningEnabled = plugin.getConfig().getBoolean("maps." + mapName + ".flags.mob_spawning", false);
+            blockBreakingEnabled = plugin.getConfig().getBoolean("maps." + mapName + ".flags.block_breaking", false);
+            blockPlacingEnabled = plugin.getConfig().getBoolean("maps." + mapName + ".flags.block_placing", false);
+            pvpEnabled = plugin.getConfig().getBoolean("maps." + mapName + ".flags.pvp", true);
+            decayEnabled = plugin.getConfig().getBoolean("maps." + mapName + ".flags.decay", false);
         }
     }
 } 

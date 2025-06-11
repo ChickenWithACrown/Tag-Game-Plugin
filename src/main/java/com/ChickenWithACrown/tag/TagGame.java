@@ -284,6 +284,21 @@ public class TagGame extends JavaPlugin implements Listener {
                     player.sendMessage(ChatColor.RED + "Game not found!");
                 }
             }
+            case "map" -> {
+                if (args.length < 3) {
+                    player.sendMessage(ChatColor.RED + "Please specify a game ID and 'flags'!");
+                    return true;
+                }
+                if (!player.hasPermission("tag.admin.map")) return true;
+                GameInstance instance = gameController.getGameInstance(args[1]);
+                if (instance != null) {
+                    if (args[2].equalsIgnoreCase("flags")) {
+                        gameView.openMapFlagsGui(player, instance);
+                    }
+                } else {
+                    player.sendMessage(ChatColor.RED + "Game not found!");
+                }
+            }
             default -> player.sendMessage(ChatColor.RED + "Unknown subcommand. Use /tag help for commands.");
         }
         return true;
@@ -470,12 +485,15 @@ public class TagGame extends JavaPlugin implements Listener {
 
             try {
                 int size = Integer.parseInt(teamSize);
-                gameController.createGameInstance(mode, size, mapName, event.getBlock().getLocation());
+                GameInstance instance = gameController.createGameInstance(mode, size, mapName, event.getBlock().getLocation());
                 
                 event.setLine(0, ChatColor.AQUA + "[TagGame]");
                 event.setLine(1, ChatColor.GREEN + mode);
                 event.setLine(2, ChatColor.YELLOW + String.valueOf(size) + "v" + String.valueOf(size));
                 event.setLine(3, ChatColor.GRAY + mapName);
+                
+                // Update sign with initial status
+                updateGameSign(instance);
             } catch (NumberFormatException e) {
                 event.getPlayer().sendMessage(ChatColor.RED + "Invalid team size! Use a number.");
             }
@@ -485,6 +503,23 @@ public class TagGame extends JavaPlugin implements Listener {
             if (event.getBlock().getState() instanceof Sign sign) {
                 gameView.updateLeaderboardSign(sign);
             }
+        }
+    }
+
+    private void updateGameSign(GameInstance instance) {
+        if (instance.getSignLocation() != null && instance.getSignLocation().getBlock().getState() instanceof Sign sign) {
+            GameState gameState = instance.getGameState();
+            int playersInGame = gameState.getPlayersInGame().size();
+            int maxPlayers = instance.getMaxPlayers();
+            String status = gameState.isGameRunning() ? ChatColor.RED + "In Progress" : 
+                          playersInGame >= maxPlayers ? ChatColor.YELLOW + "Full" :
+                          ChatColor.GREEN + "Waiting";
+            
+            sign.setLine(0, ChatColor.AQUA + "[TagGame]");
+            sign.setLine(1, ChatColor.GREEN + instance.getMode());
+            sign.setLine(2, ChatColor.YELLOW + String.valueOf(playersInGame) + "/" + String.valueOf(maxPlayers));
+            sign.setLine(3, status);
+            sign.update();
         }
     }
 

@@ -1,6 +1,7 @@
 package com.ChickenWithACrown.tag.view;
 
 import com.ChickenWithACrown.tag.model.GameState;
+import com.ChickenWithACrown.tag.model.GameInstance;
 import eu.decentsoftware.holograms.api.DHAPI;
 import eu.decentsoftware.holograms.api.holograms.Hologram;
 import org.bukkit.Bukkit;
@@ -16,6 +17,7 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Arrays;
 
 public class GameView {
     private final GameState gameState;
@@ -34,6 +36,79 @@ public class GameView {
                 createLeaderboardHologram(loc);
             }
         }
+    }
+
+    public void openMapFlagsGui(Player player, GameInstance instance) {
+        Inventory gui = Bukkit.createInventory(null, 27, ChatColor.AQUA + "Map Flags - " + instance.getDisplayName());
+
+        // Mob Spawning Toggle
+        ItemStack mobSpawning = new ItemStack(Material.ZOMBIE_SPAWN_EGG);
+        ItemMeta mobMeta = mobSpawning.getItemMeta();
+        mobMeta.setDisplayName(ChatColor.YELLOW + "Mob Spawning");
+        mobMeta.setLore(Arrays.asList(
+            ChatColor.GRAY + "Current: " + (instance.getGameWorld().isMobSpawningEnabled() ? 
+                ChatColor.GREEN + "Enabled" : ChatColor.RED + "Disabled"),
+            ChatColor.GRAY + "Click to toggle"
+        ));
+        mobSpawning.setItemMeta(mobMeta);
+        gui.setItem(10, mobSpawning);
+
+        // Block Breaking Toggle
+        ItemStack blockBreak = new ItemStack(Material.DIAMOND_PICKAXE);
+        ItemMeta breakMeta = blockBreak.getItemMeta();
+        breakMeta.setDisplayName(ChatColor.YELLOW + "Block Breaking");
+        breakMeta.setLore(Arrays.asList(
+            ChatColor.GRAY + "Current: " + (instance.getGameWorld().isBlockBreakingEnabled() ? 
+                ChatColor.GREEN + "Enabled" : ChatColor.RED + "Disabled"),
+            ChatColor.GRAY + "Click to toggle"
+        ));
+        blockBreak.setItemMeta(breakMeta);
+        gui.setItem(11, blockBreak);
+
+        // Block Placing Toggle
+        ItemStack blockPlace = new ItemStack(Material.GRASS_BLOCK);
+        ItemMeta placeMeta = blockPlace.getItemMeta();
+        placeMeta.setDisplayName(ChatColor.YELLOW + "Block Placing");
+        placeMeta.setLore(Arrays.asList(
+            ChatColor.GRAY + "Current: " + (instance.getGameWorld().isBlockPlacingEnabled() ? 
+                ChatColor.GREEN + "Enabled" : ChatColor.RED + "Disabled"),
+            ChatColor.GRAY + "Click to toggle"
+        ));
+        blockPlace.setItemMeta(placeMeta);
+        gui.setItem(12, blockPlace);
+
+        // PvP Toggle
+        ItemStack pvp = new ItemStack(Material.DIAMOND_SWORD);
+        ItemMeta pvpMeta = pvp.getItemMeta();
+        pvpMeta.setDisplayName(ChatColor.YELLOW + "PvP");
+        pvpMeta.setLore(Arrays.asList(
+            ChatColor.GRAY + "Current: " + (instance.getGameWorld().isPvPEnabled() ? 
+                ChatColor.GREEN + "Enabled" : ChatColor.RED + "Disabled"),
+            ChatColor.GRAY + "Click to toggle"
+        ));
+        pvp.setItemMeta(pvpMeta);
+        gui.setItem(13, pvp);
+
+        // Decay Toggle
+        ItemStack decay = new ItemStack(Material.ROTTEN_FLESH);
+        ItemMeta decayMeta = decay.getItemMeta();
+        decayMeta.setDisplayName(ChatColor.YELLOW + "Decay");
+        decayMeta.setLore(Arrays.asList(
+            ChatColor.GRAY + "Current: " + (instance.getGameWorld().isDecayEnabled() ? 
+                ChatColor.GREEN + "Enabled" : ChatColor.RED + "Disabled"),
+            ChatColor.GRAY + "Click to toggle"
+        ));
+        decay.setItemMeta(decayMeta);
+        gui.setItem(14, decay);
+
+        // Close Button
+        ItemStack close = new ItemStack(Material.BARRIER);
+        ItemMeta closeMeta = close.getItemMeta();
+        closeMeta.setDisplayName(ChatColor.RED + "Close");
+        close.setItemMeta(closeMeta);
+        gui.setItem(26, close);
+
+        player.openInventory(gui);
     }
 
     public void openTagGui(Player player) {
