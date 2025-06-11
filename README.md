@@ -3,7 +3,7 @@
 A feature-rich tag game plugin for Minecraft servers with multiple game modes, custom items, and leaderboard support.
 
 ## Quick Links
-- [Download Latest Release](https://github.com/ChickenWithACrown/TagGame/releases/latest)
+- [Download Latest Release](https://github.com/ChickenWithACrown/Tag-Game-Plugin/releases/latest)
 - [User Guide](Guide.md)
 - [Release Notes](RELEASE_NOTES.md)
 - [License](LICENSE)
@@ -27,7 +27,7 @@ A feature-rich tag game plugin for Minecraft servers with multiple game modes, c
   - [EssentialsX](https://essentialsx.net/downloads.html)
 
 ## Installation
-1. Download the latest release from the [Releases](https://github.com/ChickenWithACrown/TagGame/releases) page
+1. Download the latest release from the [Releases](https://github.com/ChickenWithACrown/Tag-Game-Plugin/releases) page
 2. Place TagGame.jar in your server's `plugins` folder
 3. Restart your server
 4. Follow the [User Guide](Guide.md) to set up your first game
